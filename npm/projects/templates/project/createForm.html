@@ -1,0 +1,93 @@
+{% extends "html/basic.html" %}
+{% block title %} Title {% endblock title %}
+
+{%block css %} {% endblock css %}
+{% block body %}
+{% if messages %}
+<ul class="messages list-unstyled">
+	{% for message in messages %}
+	<li {% if message.tags %}>
+		<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+			<strong> {{ message }} </strong>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endif %}
+	</li>
+	{% endfor %}
+</ul>
+{% endif %}
+
+<!-- body starts here -->
+<div class="container mb-4">
+	<h1 class="display-1 text-center">Submit your assignmet here.</h1>
+	<form method="POST" enctype="multipart/form-data" action="/project/createSubmit/">
+		{% csrf_token %}
+		<div class="mb-3">
+			<label for="exampleInputEmail1" class="form-label">Email address</label>
+			<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required name="email" />
+			<div id="emailHelp" class="form-text">
+				We'll never share your email with anyone else.
+			</div>
+		</div>
+
+		<div class="mb-3">
+			<label for="input1" class="form-label">Title</label>
+			<input placeholder="Enter Title of your project" type="text" class="form-control" id="input1"
+				aria-describedby="input1Help" name="title" required />
+		</div>
+		<div class="mb-3">
+			<label for="input3" class="form-label">Description</label>
+			<input placeholder="Enter Description of your project" type="text" class="form-control" id="input3"
+				aria-describedby="input3Help" name="desc" required />
+		</div>
+
+		<div class="mb-3">
+			<label for="input5" class="form-label">Enrollment number</label>
+			<input maxlength="10" minlength="10" min="10" max="10" placeholder="Enter your Enrollment number"
+				type="text" class="form-control" id="input5" aria-describedby="input5Help" name="enroll_no" required />
+		</div>
+		<div class="mb-3">
+			<label for="input5" class="form-label">Select your Year and Class</label>
+			<div class="row">
+
+
+
+				<div class="col"><select name="year" class="form-select" aria-label="select Year">
+						<option value="None" selected>Select your Year</option>
+						<option value="1">I</option>
+						<option value="2">II</option>
+						<option value="3">III</option>
+					</select></div>
+				<div class="col"><select name="sec" class="form-select" aria-label=" select Class">
+						<option selected value="None">Select your Class </option>
+						<option value="a">A</option>
+						<option value="b">B</option>
+					</select></div>
+			</div>
+		</div>
+
+
+
+		<div class="mb-3">
+			<label for="input2" class="form-label">Github Link</label>
+			<input placeholder="Enter Github Link of your project" type="text" class="form-control" id="input2"
+				aria-describedby="input2Help" name="git_link" required />
+		</div>
+		<div class="mb-3">
+			<label for="input4" class="form-label">Live Link (Optional)</label>
+			<input placeholder="Enter Live Link of your project" type="text" class="form-control" id="input4"
+				aria-describedby="input4Help" name="live_link" />
+		</div>
+
+		<div class="mb-3">
+			<label for="formFile"  class="form-label">Screenshots (Optional)</label>
+			<input class="form-control" name="screenshot" type="file" id="formFile">
+		</div>
+
+
+
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+</div>
+
+{% endblock body %}

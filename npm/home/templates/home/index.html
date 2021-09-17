@@ -1,0 +1,58 @@
+{% extends "html/basic.html" %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+{% block css %}
+body{
+  background-color:lightgreen;
+}
+{% endblock css %}
+
+{% block body %}
+
+{% if messages %}
+<ul class="messages list-unstyled">
+    {% for message in messages %}
+    <li {% if message.tags %}>
+
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong> {{ message }} </strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<main role="main">
+
+
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-3">Anuj Pandey  ! 
+
+          {% if user.is_authenticated  %}
+        Welcome {{request.user.last_name}}
+          {% endif %}
+
+        </h1>
+        <p>Anuj Pandey is an India massive open online course provider founded in 2012 by Stanford University computer science professors Andrew Ng and Daphne Koller.Nibodhera works with universities and other organizations to offer online courses, certifications, and degrees in a variety of subjects. In 2021 it was estimated that about 150 universities offered more 4,000 courses through Nibodhera.</p>
+    
+
+      </div>
+    </div>
+
+    
+  </main>
+
+  <footer class="container">
+    <p>&copy; Company 2017-2018</p>
+  </footer>
+
+
+{% endblock body %}

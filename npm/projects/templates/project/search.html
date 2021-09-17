@@ -1,0 +1,310 @@
+{% extends "html/basic.html" %}
+
+{% block title %}
+Projects
+{% endblock title %}
+
+{% block css %}
+
+
+.custom-list .card-title,.custom-list .card-subtitle ,.custom-list .card-text {
+  text-transform: capitalize;
+
+}
+.custom-list .card{
+  padding: 25px;
+  margin: 10px 0;
+}
+
+{% endblock css %}
+
+{% block body %}
+
+{% if messages %}
+<ul class="messages list-unstyled">
+    {% for message in messages %}
+    <li {% if message.tags %}>
+
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong> {{ message }} </strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<!-- body starts here -->
+
+
+<div class="container custom-list">
+
+<h1 class="m-4 ms-0"> Search for " {{searched}} "</h1>
+
+
+    {% for d in data %}
+      <div class="card my-2 px-4 customn">
+        <div class="card-body">
+            <h1 class="card-title">{{d.title}}</h1>
+            <h4 class="card-subtitle mb-2 text-muted">{{d.submitted_by}}  {{d.year}}-{{d.sec}}</h4>
+            <p class="card-text">{{d.desc}}</p>
+            {% if d.git_link|length > 0 %}
+              <a target="_blank" href="{{d.git_link}}" class="btn btn-success card-link">GitHub Link</a>
+            {% endif %}
+            {% if d.live_link|length > 0 %}
+            <a target="_blank" href="{{d.live_link}}" class="btn btn-primary card-link">Live Link</a>
+            {% endif %}
+            {% if d.screenshot|length > 0 %}
+              <button
+                type="button"
+                class="card-link btn btn-primary mx-2"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal_{{d.id}}"
+              >
+                See Screenshot
+              </button>
+            {% endif %}
+            {% if d.submitted_by.id == request.user.id or request.user.is_superuser %}
+              <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#askModal_{{d.id}}">
+                User Action
+              </button>
+            {% endif %}
+            {% if request.user.is_staff %}
+              <button type="button" class="card-link btn btn-danger mx-02" data-bs-toggle="modal" data-bs-target="#staffModal_{{d.id}}">
+                Add remarks
+              </button>
+            {% endif %}
+            <div class="modal fade" id="exampleModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Screenshot submitted</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body d-flex justify-content-center">
+                    {% if d.screenshot|length > 0 %}
+                    <img src="/media/{{d.screenshot}}" class="img-thumbnail" style="height:300px;" alt="">
+                    {% else %}
+                    No screenshot submitted
+                    {% endif %}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+          <div class="modal fade" id="askModal_{{d.id}}" tabindex="-1" aria-labelledby="askModal_{{d.id}}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="askModal_{{d.id}}">What do yopu want to do with this project?</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <button type="button" class="btn btn-secondary" data-bs-target="#editmodal_{{d.id}}" data-bs-toggle="modal" data-bs-dismiss="modal" >Edit this project</button>
+                  <button type="button" class="btn btn-danger"  data-bs-target="#deleteModal_{{d.id}}" data-bs-toggle="modal" data-bs-dismiss="modal">Delete this project</button>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- edit modal -->
+          <div class="modal fade" id="editmodal_{{d.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editmodalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="staticBackdropLabel">Edit project</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" enctype="multipart/form-data" action="/project/edit/{{d.id}}">
+                  <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                      <label for="exampleInputEmail1" class="form-label">Email address</label>
+                      <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required name="email" value="{{d.email}}" />
+                      <div id="emailHelp" class="form-text">
+                        We'll never share your email with anyone else.
+                      </div>
+                    </div>
+                
+                    <div class="mb-3">
+                      <label for="input1" class="form-label">Title</label>
+                      <input placeholder="Enter Title of your project" type="text" class="form-control" id="input1"
+                        aria-describedby="input1Help" name="title" required value="{{d.title}}" />
+                    </div>
+                    <div class="mb-3">
+                      <label for="input3" class="form-label">Description</label>
+                      <input placeholder="Enter Description of your project" type="text" class="form-control" id="input3"
+                        aria-describedby="input3Help" name="desc" required value="{{d.desc}}" />
+                    </div>
+                
+                    <div class="mb-3">
+                      <label for="input5" class="form-label">Enrollment number</label>
+                      <input maxlength="10" minlength="10" min="10" max="10" placeholder="Enter your Enrollment number"
+                        type="text" class="form-control" id="input5" aria-describedby="input5Help" name="enroll_no" required value="{{d.enroll_no}}" />
+                    </div>
+                    <div class="mb-3">
+                      <label for="input5" class="form-label">Select your Year and Class</label>
+                      <div class="row">
+                        <div class="col">
+                          <select name="year" class="form-select" aria-label="select Year">
+                            <option value="None">Select your Year</option>
+                            <option value="1" {% if d.year == '1' %}selected {% endif %} >I</option>
+                            <option value="2" {% if d.year == "2" %}selected {% endif %} >II</option>
+                            <option value="3" {% if d.year == "3" %}selected {% endif %} >III</option>
+                          </select>
+                        </div>
+                        <div class="col">
+                          <select name="sec" class="form-select" aria-label=" select Class">
+                            <option value="None">Select your Class </option>
+                            <option value="a" {% if d.sec == "a" %}selected {% endif %} >A</option>
+                            <option value="b" {% if d.sec == "b" %}selected {% endif %} >B</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="input2" class="form-label">Github Link</label>
+                      <input placeholder="Enter Github Link of your project" type="text" class="form-control" id="input2"
+                        aria-describedby="input2Help" name="git_link" required value="{{d.git_link}}" />
+                    </div>
+                    <div class="mb-3">
+                      <label for="input4" class="form-label">Live Link (Optional)</label>
+                      <input placeholder="Enter Live Link of your project" type="text" class="form-control" id="input4"
+                        aria-describedby="input4Help" name="live_link" value="{{d.live_link}}" />
+                    </div>
+                
+                    <div class="mb-3">
+                      <label for="formFile"  class="form-label">Screenshots (Optional)</label>
+                      <input class="form-control" name="screenshot" type="file" id="formFile">
+                    </div>        
+                  </div> 
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit</button> 
+                  </div> 
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete modal -->
+          <div class="modal fade" id="deleteModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Remove this Project?</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <h1>Are you Sure You want to remove this project? This action cannot be undone.</h1>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                  <a href="/project/delete/{{d.id}}" class="btn btn-danger" >Yes</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal fade" id="staffModal_{{d.id}}" tabindex="-1" aria-labelledby="exampleModalLabel_{{d.id}}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel_{{d.id}}">Add remarks</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/project/remarks/{{d.id}}" method="post">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <div class="form-floating m-2">
+                      <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="remarks"></textarea>
+                      <label for="floatingTextarea2">Remarks</label>
+                    </div>
+                    <div class="form-floating m-2">
+                      <select class="form-select" name="rating"   id="floatingSelectGrid" aria-label="Floating label select example">
+                        <option selected>Open this select menu</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                      </select>
+                      <label for="floatingSelectGrid">Select Rating</label>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" >Submit</>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div>
+            <ul class="remarks-con">
+              {% if not d.project.all %}
+                <li>
+                  <div class="post-comments">
+                      <p>
+                      No remarks...
+                    </p>
+                </div>
+                </li>
+
+              {% else %}
+                {% for r in d.project.all  %}
+                  <li>
+                    <div class="post-comments">
+                      <p class="meta"><span class="badge bg-secondary">{{r.rating}} 	&#9733; </span>  {{r.pub_date}} <a href="#">{{r.author.username}}</a> says : </p>
+                      <p>
+                        {{r.remarks}}
+                      </p>
+                    </div>
+                    </li>
+                {% endfor %}
+              {% endif %}      
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+
+  
+</div>
+
+
+
+
+
+
+
+{% endblock body %}
